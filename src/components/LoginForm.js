@@ -93,7 +93,6 @@ function clearError() {
 export function Logout() {
     localStorage.removeItem("jwt")
     window.location.reload()
-console.log("aaaaaaaaaaaaaaaaaa");
 
 
 }
