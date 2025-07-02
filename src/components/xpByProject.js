@@ -1,14 +1,14 @@
 import { createSVG } from '../utils/App.js';
-import {DrawXpchart} from './components/xpOverTime.js'
-import { GetXP } from './xpOverTime.js'
-
+import { DrawXpchart } from '../components/xpOverTime.js';
+import { fetchXp } from './Profile.js';
 
 export async function GetXPByProject() {
   try {
     const xp = await fetchXp();
-    const transactions = xp.data.user[0].transactions;
+    const transactions = xp;
+    console.log(transactions ,  "dddddddddddddd", xp.data);
+    
 
-    // Group by project name
     const grouped = {};
 
     transactions.forEach(t => {
@@ -16,47 +16,51 @@ export async function GetXPByProject() {
       grouped[projectName] = (grouped[projectName] || 0) + t.amount;
     });
 
-    const projectXPArray = Object.entries(grouped).map(([name, amount]) => ({ name, amount }));
+    const projectXPArray = Object.entries(grouped)
+      .map(([name, amount]) => ({ name, amount }))
+      .sort((a, b) => b.amount + a.amount); // sort descending
 
+    console.log("Grouped XP by Project:", projectXPArray);
     return projectXPArray;
-
   } catch (error) {
     console.error("Error fetching XP by project:", error);
     throw error;
   }
 }
 
-
 export async function XPByProjectChart() {
   try {
     const svg = DrawXpchart();
-    const container = document.querySelector("#container");
-    container.innerHTML = ""; // clear previous chart
+    const container = document.querySelector("#project-xp-chart");
+    container.innerHTML = "";
+
     const xpData = await GetXPByProject();
 
-    const MaxXp = Math.max(...xpData.map(d => d.amount));
+    const maxXP = Math.max(...xpData.map(d => d.amount));
+    const fullXP = xpData.reduce((acc, cur) => acc + cur.amount, 0);
     const barWidth = 500 / xpData.length;
 
     xpData.forEach((d, i) => {
       const x = i * barWidth;
-      const height = (d.amount / MaxXp) * 250;
+      const height = (d.amount / maxXP) * 250;
       const y = 280 - height;
+      const percent = ((d.amount * 100) / fullXP).toFixed(2);
 
-      svg.appendChild(createSVG("rect", {
+      const bar = createSVG("rect", {
         x,
         y,
-        width: barWidth - 5,
+        width: barWidth - 6,
         height,
-        fill: "teal"
-      }));
+        rx: 5,
+        ry: 5,
+        class: "chart-bar"
+      });
 
- 
-      svg.appendChild(createSVG("text", {
-        x: x + barWidth / 2,
-        y: 295,
-        "font-size": "10",
-        "text-anchor": "middle"
-      })).textContent = d.name.slice(0, 10);
+      const tooltip = createSVG("title");
+      tooltip.textContent = `Project: ${d.name}\nContribution: ${percent}%`;
+      bar.appendChild(tooltip);
+
+      svg.appendChild(bar);
     });
 
     container.appendChild(svg);
@@ -65,4 +69,3 @@ export async function XPByProjectChart() {
     throw error;
   }
 }
-

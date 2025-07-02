@@ -1,108 +1,81 @@
-import { fetchGraph } from "../services/graphql.js"
+import { fetchGraph } from "../services/graphql.js";
+import RenderUserLevel from "./Level.js";
 
 export async function fetchXp() {
   const xpQuery = {
-    query:
-      `
-{
-  user {
-    transactions(where : 
-      {_and: [{type :{ _eq : "xp"}} , 
-				{eventId : {_eq : 41}}]}
-    ){
-      amount
-      createdAt
-    }
-    }
+    query: `{
+      user {
+        transactions(where: {
+          _and: [{type: {_eq: "xp"}}, {eventId: {_eq: 41}}]
+        }) {
+          amount
+          createdAt
+          object {
+            name
+          }
+        }
+      }
+    }`
+  };
+  const res = await fetchGraph(xpQuery);
+  return res.data.user[0].transactions;
 }
-    `
-  }
-  try {
-    const xp = await fetchGraph(xpQuery)
-    console.log(xp);
-    return xp
-  } catch (error) {
-    console.log("Failed to fetch XP:", error);
-
-    throw error;
-
-  }
-
-}
-
-
-
 
 export async function currentXP() {
-  try {
-    const xp = await fetchXp()
-    console.log(xp.data.user[0].transactions);
-    const xpp = xp.data.user[0].transactions.reduce((acc, current) => { return acc + current.amount }, 0)
-    console.log("aamount", xpp);
-    const XpAMount = (xpp / Math.pow(1000, 2))
-    const XpConverstion = XpAMount >= 1 ? "MB" : "KB"
-    return `<p class="CurrentXp"> ${XpConverstion === "KB" ? (XpAMount * 1000).toFixed() : XpAMount.toFixed(2)}${XpConverstion}</p>`
-  } catch (error) {
-    console.log(error);
-    throw error
-
-  }
-
+  const transactions = await fetchXp();
+  const total = transactions.reduce((acc, curr) => acc + curr.amount, 0);
+  const mb = total / 1_000_000;
+  const isMB = mb >= 1;
+  return `
+    <div class="bento-box glass reveal">
+      <h3>Current XP</h3>
+      <p>${isMB ? mb.toFixed(2) + " MB" : (mb * 1000).toFixed() + " KB"}</p>
+    </div>`;
 }
-
 
 export async function AuditRatio() {
-  const AuditQuery = {
-    query: `{
-  user{
-    auditRatio
-  }
-}`
-  }
-  try {
-    const Audit = await fetchGraph(AuditQuery)
-    console.log("audiiit", Audit.data.user[0].auditRatio);
-    const Res = Audit.data.user[0].auditRatio
-    //  > 1 ? (Audit.data.user[0].auditRatio).toFixed(2): Audit.data.user[0].auditRatio
-
-    return `<p class="AuditRatio"> Audit Ratio : ${Math.ceil(10 * Res) / 10} </p>`
-
-  } catch (error) {
-    console.log(error);
-    throw error
-  }
-
+  const query = { query: `{ user { auditRatio } }` };
+  const res = await fetchGraph(query);
+  const ratio = Math.ceil(10 * res.data.user[0].auditRatio) / 10;
+  return `
+    <div class="bento-box glass reveal">
+      <h3>Audit Ratio</h3>
+      <p>${ratio}</p>
+    </div>`;
 }
-
-const Audit = await AuditRatio()
-console.log(Audit);
-
 
 export async function UserName() {
-  const UsernameQUey = {
-    query: `{ 
-user
-{
-  login
-  firstName
-  lastName}}`}
-
-
-  try {
-
-    const Username = await fetchGraph(UsernameQUey)
-    const Login = Username.data.user[0].login
-    const Fullname = `Hello ${Username.data.user[0].firstName}${Username.data.user[0].lastName}`
-    console.log("usseername", Username, Fullname, Login);
-
-    return `<p> ${Fullname}<p>`
-
-
-
-  } catch (error) {
-    console.log(error);
-    throw error
-  }
+  const query = { query: `{ user { login firstName lastName } }` };
+  const res = await fetchGraph(query);
+  const { firstName, lastName } = res.data.user[0];
+  return `
+    <div >
+      <h1 class="greeting">Hello, ${firstName} ${lastName}</h1>
+    </div>`;
 }
 
-await UserName()
+export  async  function Profile() {
+  const container = document.querySelector("#user_identication");
+  if (!container) return;
+
+  try {
+    container.innerHTML = `
+      <div class="bento-box glass reveal">Loading user data...</div>
+    `;
+
+    const [name, audit, xp, level] = await Promise.all([
+      UserName(),
+      AuditRatio(),
+      currentXP(),
+      RenderUserLevel()
+    ]);
+    console.log();
+    
+
+    container.innerHTML = name + audit + xp + level;
+
+  } catch (err) {
+    container.innerHTML = `<div class="bento-box glass reveal"><p>Failed to load profile.</p></div>`;
+    console.error("Profile Load Error:", err);
+  }
+}

@@ -1,20 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="index .css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Abstract Dashboard</title>
+    <link rel="stylesheet" href="index.css" />
+    <style>
 
-    <title>GraphQL</title>
+    </style>
 </head>
+
 <body>
-    <div id="container">
 
-        <div id="viewbox"></div>
-    </div>
+    <nav>
+        <div class="logo">LOGO</div>
+    </nav>
+
+    <main>
+ 
+        <!-- Injected dynamically by Profile.js -->
+        
+        <section id="user_identication" class="bento-container reveal"></section>
+        <h3>XP by Project</h3>
+        <section id="project-xp-chart" class="bento-box reveal"></section>
+        <h3>XP by Time</h3>
+        <section id="xp-chart" class="bento-box reveal"></section>
+
+
+ 
+<!-- 
+        <section class="login-form-container reveal">
+            <h2>Login</h2>
+    
+        </section> -->
+    </main>
+
+    <!-- <script>
+    // Scroll reveal
+    function reveal() {
+      const reveals = document.querySelectorAll('.reveal');
+      for (const reveal of reveals) {
+        const windowHeight = window.innerHeight;
+        const revealTop = reveal.getBoundingClientRect().top;
+        const revealPoint = 100;
+
+        if (revealTop < windowHeight - revealPoint) {
+          reveal.classList.add('active');
+        } else {
+          reveal.classList.remove('active');
+        }
+      }
+    }
+
+    window.addEventListener('scroll', reveal);
+    window.addEventListener('load', reveal);
+  </script> -->
+
+    <!-- Your main JS file -->
+    <script type="module" src="../src/utils/App.js"></script>
+    <script type="module" src="../src/components/LoginForm.js"></script>
 </body>
-<script type="module" src="../src/utils/App.js">
-</script>
+
 </html>
-
-
