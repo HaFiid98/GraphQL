@@ -1,0 +1,19 @@
+#container {
+  max-width: 600px;    /* limits how wide the graph can get */
+  margin: 20px auto;   /* centers horizontally with vertical margin */
+  border: 1px solid #ccc; /* optional: to see the container edges */
+  padding: 10px;
+}
+
+svg {
+  width: 100%;         /* fill container’s width */
+  height: auto;        /* maintain aspect ratio */
+  max-height: 300px;   /* limit max height */
+  display: block;      /* remove inline spacing */
+  margin: 0 auto;      /* center svg if container is wider */
+}
+
+
+#viewBox{
+    background-color: black;
+}
