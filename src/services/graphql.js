@@ -1,3 +1,4 @@
+import { Logout } from "../components/LoginForm.js";
 export async function fetchGraph(query) {
     const token = localStorage.getItem("jwt")
     console.log("tooken",token);
@@ -18,7 +19,8 @@ export async function fetchGraph(query) {
     
     .catch(err => {
         console.log(err);
-        window.alert(err)
+        Logout()
          throw err;
+         
     })
 }

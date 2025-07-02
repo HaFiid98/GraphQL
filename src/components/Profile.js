@@ -1,5 +1,6 @@
 import { fetchGraph } from "../services/graphql.js";
 import RenderUserLevel from "./Level.js";
+import { Logout } from "./LoginForm.js";
 
 export async function fetchXp() {
   const xpQuery = {
@@ -77,5 +78,6 @@ export  async  function Profile() {
   } catch (err) {
     container.innerHTML = `<div class="bento-box glass reveal"><p>Failed to load profile.</p></div>`;
     console.error("Profile Load Error:", err);
+    Logout()
   }
 }

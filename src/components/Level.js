@@ -19,7 +19,7 @@ user {
        console.log("leeeevel", level, level.data.user[0].transactions[0].amount);
 
 
-    return `<p>Level: ${level.data.user[0].transactions[0].amount}</p>`
+    return `<p class="bento-box reveal"> <b>LEVEL</b><br><br> ${level.data.user[0].transactions[0].amount}</p>`
   } catch (error) {
     console.log(error);
     throw error
