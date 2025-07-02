@@ -63,6 +63,7 @@ main.appendChild(container)
       // You can trigger profile reload or redirect here
       window.location.reload()
     } catch (err) {
+      Logout()
       showError(err.message);
       console.error(err);
     }
